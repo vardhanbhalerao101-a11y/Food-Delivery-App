@@ -1,0 +1,10 @@
+FOOD DELIVERY APPLICATION
+
+Features:
+1. Customer Registration and Login
+2. Search Restaurants
+3. View Restaurant Menu
+4. Add Food Items to Cart
+5. Place Order
+6. Online Payment
+7. Track Order
