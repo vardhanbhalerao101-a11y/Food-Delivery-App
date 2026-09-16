@@ -8,3 +8,5 @@ Features:
 5. Place Order
 6. Online Payment
 7. Track Order
+Search Restaurants:
+Customers can search for restaurants by restaurant name or food item.
