@@ -1,0 +1,102 @@
+name: Food Delivery CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          mkdir -p dist
+          cp index.html dist/
+          cp style.css dist/
+          cp script.js dist/
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: food-delivery-build
+          path: dist/
+
+  test:
+    name: Test
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test application files
+        run: |
+          test -f index.html
+          test -f style.css
+          test -f script.js
+          grep -q "Food Delivery App" index.html
+          echo "All tests passed successfully."
+
+  package:
+    name: Package
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create package
+        run: |
+          mkdir package
+          cp index.html package/
+          cp style.css package/
+          cp script.js package/
+          zip -r food-delivery-app.zip package/
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: food-delivery-package
+          path: food-delivery-app.zip
+
+  deploy:
+    name: Deploy
+    needs: package
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
